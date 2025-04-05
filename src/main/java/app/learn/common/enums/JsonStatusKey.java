@@ -1,4 +1,4 @@
-package app.learn.enums;
+package app.learn.common.enums;
 
 public enum JsonStatusKey {
     success,

@@ -1,7 +1,5 @@
-package app.learn.models;
+package app.learn.task;
 
-import app.learn.enums.TaskPriority;
-import app.learn.enums.TaskStatus;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;

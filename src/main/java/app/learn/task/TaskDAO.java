@@ -1,7 +1,6 @@
-package app.learn.dao;
+package app.learn.task;
 
-import app.learn.config.DatabaseConfig;
-import app.learn.models.Task;
+import app.learn.common.config.DatabaseConfig;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
 

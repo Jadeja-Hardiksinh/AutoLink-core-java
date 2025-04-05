@@ -1,11 +1,8 @@
-package app.learn.controllers.apis;
+package app.learn.task;
 
-import app.learn.dto.GenericDTO;
-import app.learn.dto.TaskDTO;
-import app.learn.enums.JsonStatusKey;
-import app.learn.models.Task;
-import app.learn.services.TaskService;
-import app.learn.util.JsonUtil;
+import app.learn.common.dto.GenericDTO;
+import app.learn.common.enums.JsonStatusKey;
+import app.learn.common.util.JsonUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -22,12 +19,13 @@ import java.util.regex.Pattern;
 
 public class TaskController implements HttpHandler {
     private final Map<Pattern, Map<String, Consumer<HttpExchange>>> routes = new LinkedHashMap<>();
-    TaskService taskService = new TaskService();
+
 
     @Override
-    public void handle(HttpExchange httpExchange) throws IOException {
-        String reqPath = httpExchange.getRequestURI().getPath();
-        String reqMethod = httpExchange.getRequestMethod();
+    public void handle(HttpExchange exchange) throws IOException {
+        String reqPath = exchange.getRequestURI().getPath();
+        String reqMethod = exchange.getRequestMethod();
+        boolean matched = false;
         addRoutes("^/tasks$", "GET", this::fetchTasks);
         addRoutes("^/tasks$", "POST", this::createTask);
         addRoutes("^/tasks/\\d+$", "PUT", this::updateTask);
@@ -37,10 +35,18 @@ public class TaskController implements HttpHandler {
             if (entry.getKey().matcher(reqPath).matches()) {
                 Map<String, Consumer<HttpExchange>> methodMap = entry.getValue();
                 if (methodMap.containsKey(reqMethod)) {
-                    methodMap.get(reqMethod).accept(httpExchange);
+                    methodMap.get(reqMethod).accept(exchange);
+                    matched = true;
                     break;
                 }
             }
+        }
+        if (!matched) {
+
+
+            exchange.sendResponseHeaders(404, -1);
+            exchange.close();
+
         }
     }
 
@@ -49,6 +55,8 @@ public class TaskController implements HttpHandler {
     }
 
     public void createTask(HttpExchange exchange) {
+        TaskService taskService = new TaskService();
+
         ObjectMapper objectMapper = JsonUtil.getObjectMapper();
         try (OutputStream os = exchange.getResponseBody()) {
             Task task = objectMapper.readValue(exchange.getRequestBody(), Task.class);
@@ -60,7 +68,7 @@ public class TaskController implements HttpHandler {
             exchange.getResponseHeaders().add("Content-Type", "application/json");
             exchange.sendResponseHeaders(201, b.length);
             os.write(b);
-           
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -69,6 +77,8 @@ public class TaskController implements HttpHandler {
     }
 
     public void updateTask(HttpExchange exchange) {
+        TaskService taskService = new TaskService();
+
         ObjectMapper mapper = JsonUtil.getObjectMapper();
         String[] parts = exchange.getRequestURI().getPath().split("/");
         Long id = Long.parseLong(parts[parts.length - 1]);
@@ -108,6 +118,8 @@ public class TaskController implements HttpHandler {
 
 
     public void fetchTasks(HttpExchange exchange) {
+        TaskService taskService = new TaskService();
+
         List<Task> tasks = taskService.fetchAllTasks();
         ObjectMapper mapper = JsonUtil.getObjectMapper();
         if (!tasks.isEmpty()) {
@@ -141,10 +153,11 @@ public class TaskController implements HttpHandler {
     }
 
     public void deleteTask(HttpExchange exchange) {
+        TaskService taskService = new TaskService();
+
         String[] parts = exchange.getRequestURI().getPath().split("/");
         Long id = Long.parseLong(parts[parts.length - 1]);
         ObjectMapper mapper = JsonUtil.getObjectMapper();
-
         if (taskService.deleteTask(id)) {
             try (OutputStream os = exchange.getResponseBody()) {
                 String resString = mapper.writeValueAsString(new GenericDTO(JsonStatusKey.success, "Task Deleted"));

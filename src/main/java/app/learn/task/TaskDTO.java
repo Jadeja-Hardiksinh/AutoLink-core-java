@@ -1,7 +1,6 @@
-package app.learn.dto;
+package app.learn.task;
 
-import app.learn.enums.JsonStatusKey;
-import app.learn.models.Task;
+import app.learn.common.enums.JsonStatusKey;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonPropertyOrder({"status", "message", "task"})

@@ -1,4 +1,4 @@
-package app.learn.config;
+package app.learn.common.config;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;

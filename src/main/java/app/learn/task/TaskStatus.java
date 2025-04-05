@@ -1,4 +1,4 @@
-package app.learn.enums;
+package app.learn.task;
 
 public enum TaskStatus {
     PENDING("PENDING"),
