@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AutoLink Dashboard</title>
+    <style>
+      :root {
+        --primary: #1f2937;
+        --accent: #6b7280;
+        --bg-light: #f9fafb;
+        --text-dark: #111827;
+        --text-muted: #6b7280;
+        --card-bg: #ffffff;
+        --radius: 20px;
+        --shadow: 0 15px 35px rgba(0, 0, 0, 0.05);
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Outfit", sans-serif;
+      }
+
+      body {
+        background: var(--bg-light);
+        display: flex;
+        min-height: 100vh;
+        color: var(--text-dark);
+        font-size: 16px;
+        flex-direction: column;
+        overflow-x: hidden;
+      }
+
+      .container {
+        display: flex;
+        justify-content: space-between;
+        flex: 1;
+        padding: 40px;
+        gap: 30px;
+      }
+
+      .sidebar {
+        width: 250px;
+        background: #2d3748; /* Darkened the background */
+        color: white;
+        border-radius: var(--radius);
+        padding: 30px 20px;
+        box-shadow: var(--shadow);
+        display: flex;
+        flex-direction: column;
+        gap: 30px;
+        position: sticky;
+        top: 0;
+        height: auto;
+      }
+
+      .sidebar h2 {
+        font-size: 1.7em;
+        font-weight: 600;
+        text-align: center;
+      }
+
+      .sidebar-nav {
+        list-style: none;
+        padding: 0;
+      }
+
+      .sidebar-nav li {
+        margin-bottom: 25px;
+      }
+
+      .sidebar-nav a {
+        text-decoration: none;
+        color: white;
+        font-weight: 500;
+        font-size: 1.2em;
+        padding: 10px;
+        border-radius: 10px;
+        display: block;
+        transition: 0.3s background;
+      }
+
+      .sidebar-nav a:hover {
+        background-color: var(--accent);
+      }
+
+      .main-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 30px;
+        padding-right: 20px;
+      }
+
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 20px;
+        background: white;
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        padding: 20px;
+      }
+
+      .header h1 {
+        font-size: 2em;
+        color: var(--text-dark);
+      }
+
+      .settings-dropdown {
+        position: relative;
+        display: inline-block;
+      }
+
+      .settings-icon {
+        width: 40px;
+        height: 40px;
+        background-color: var(--accent);
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+      }
+
+      .settings-dropdown-content {
+        display: none;
+        position: absolute;
+        background-color: white;
+        min-width: 160px;
+        box-shadow: var(--shadow);
+        z-index: 1;
+        border-radius: var(--radius);
+        top: 100%;
+        right: 0;
+        margin-right: 10px; /* Adds some space to the right */
+      }
+
+      .settings-dropdown:hover .settings-dropdown-content {
+        display: block;
+      }
+
+      .settings-dropdown-content a {
+        color: var(--text-dark);
+        padding: 12px 16px;
+        text-decoration: none;
+        display: block;
+        font-weight: 500;
+      }
+
+      .settings-dropdown-content a:hover {
+        background-color: var(--accent);
+      }
+
+      .dashboard-cards {
+        display: flex;
+        gap: 30px;
+        justify-content: space-between;
+      }
+
+      .card {
+        background: var(--card-bg);
+        padding: 25px;
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        transition: transform 0.2s;
+      }
+
+      .card:hover {
+        transform: translateY(-10px);
+      }
+
+      .card h3 {
+        font-size: 1.6em;
+        color: var(--text-dark);
+        margin-bottom: 20px;
+      }
+
+      .card p {
+        color: var(--text-muted);
+        font-size: 1.1em;
+        margin-bottom: 20px;
+      }
+
+      @media (max-width: 768px) {
+        .container {
+          flex-direction: column;
+          gap: 20px;
+        }
+
+        .sidebar {
+          width: 100%;
+          padding: 20px;
+        }
+
+        .main-content {
+          padding: 20px;
+        }
+
+        .dashboard-cards {
+          flex-direction: column;
+          gap: 20px;
+        }
+      }
+      /* Modal Styles */
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        justify-content: center;
+        align-items: center;
+      }
+
+      .modal-content {
+        background: var(--card-bg);
+        padding: 40px;
+        border-radius: var(--radius);
+        width: 50%;
+        box-shadow: var(--shadow);
+      }
+
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .modal-header h2 {
+        font-size: 1.8em;
+        color: var(--text-dark);
+      }
+
+      .modal-header button {
+        background: var(--primary);
+        color: white;
+        border: none;
+        font-size: 1.2em;
+        padding: 8px 15px;
+        cursor: pointer;
+        border-radius: 8px;
+      }
+
+      .modal-header button:hover {
+        background: var(--accent);
+      }
+
+      /* Show Modal */
+      .modal.show {
+        display: flex;
+      }
+
+      @media (max-width: 768px) {
+        .container {
+          flex-direction: column;
+          gap: 20px;
+        }
+
+        .sidebar {
+          width: 100%;
+          padding: 20px;
+        }
+
+        .main-content {
+          padding: 20px;
+        }
+
+        .dashboard-cards {
+          flex-direction: column;
+          gap: 20px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <h2>AutoLink</h2>
+        <ul class="sidebar-nav">
+          <li><a href="#">Workflows</a></li>
+          <li><a href="#">Integrations</a></li>
+          <li><a href="#">Settings</a></li>
+          <li>
+            <a href="#" id="createWorkflowBtn">Create Workflow</a>
+          </li>
+        </ul>
+      </aside>
+
+      <!-- Main Content Area -->
+      <main class="main-content">
+        <div class="header">
+          <h1>Welcome Back, User</h1>
+          <div class="settings-dropdown">
+            <div class="settings-icon">
+              <span style="color: white; font-size: 1.5em">⚙️</span>
+            </div>
+            <div class="settings-dropdown-content">
+              <a href="#">Go to Settings</a>
+              <a href="#">Logout</a>
+            </div>
+          </div>
+        </div>
+
+        <section class="dashboard-cards">
+          <div class="card">
+            <h3>Recent Workflows</h3>
+            <p>
+              No recent workflows yet. Start creating new workflows to automate
+              your tasks.
+            </p>
+          </div>
+          <div class="card">
+            <h3>Your Integrations</h3>
+            <p>Connect your Google services like Gmail, Calendar, and Drive.</p>
+          </div>
+          <div class="card">
+            <h3>Scheduled Tasks</h3>
+            <p>
+              You don't have any scheduled tasks yet. Get started by creating a
+              workflow.
+            </p>
+          </div>
+        </section>
+      </main>
+    </div>
+    <!-- Modal for Create Workflow -->
+    <div class="modal" id="workflowModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Create Workflow</h2>
+          <button id="closeModalBtn">Close</button>
+        </div>
+        <p>This is where you can create a new workflow for automating tasks!</p>
+      </div>
+    </div>
+    <script>
+      const createWorkflowBtn = document.getElementById("createWorkflowBtn");
+      const workflowModal = document.getElementById("workflowModal");
+      const closeModalBtn = document.getElementById("closeModalBtn");
+
+      // Open modal on button click
+      createWorkflowBtn.addEventListener("click", () => {
+        workflowModal.classList.add("show");
+      });
+
+      // Close modal on button click
+      closeModalBtn.addEventListener("click", () => {
+        workflowModal.classList.remove("show");
+      });
+
+      // Prevent closing modal on clicking outside of it
+      workflowModal.addEventListener("click", (e) => {
+        if (e.target === workflowModal) {
+          e.stopPropagation(); // Prevent closing when clicking outside the modal
+        }
+      });
+    </script>
+  </body>
+</html>

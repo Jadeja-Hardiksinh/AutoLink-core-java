@@ -47,7 +47,7 @@ public class UserController implements HttpHandler {
             httpExchange.sendResponseHeaders(404, -1);
             httpExchange.close();
         }
-
+        
     }
 
     public void addRoutes(String regex, String reqMethod, Consumer<HttpExchange> handler) {
@@ -68,11 +68,11 @@ public class UserController implements HttpHandler {
                 os.write(b);
                 os.close();
             } else {
-                String resString = JsonUtil.createJson("User already present", JsonStatusKey.success, null, null);
+                String resString = JsonUtil.createJson("User already present", JsonStatusKey.error, null, null);
                 byte[] b = resString.getBytes(StandardCharsets.UTF_8);
                 exchange.getResponseHeaders().add("Content-Type", "application/json");
                 try {
-                    exchange.sendResponseHeaders(200, b.length);
+                    exchange.sendResponseHeaders(409, b.length);
                     os.write(b);
                     os.close();
                 } catch (IOException ex) {
