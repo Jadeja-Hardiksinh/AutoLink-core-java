@@ -2,6 +2,7 @@ package app.learn.user;
 
 import app.learn.common.enums.JsonStatusKey;
 import app.learn.common.util.JsonUtil;
+import app.learn.integrations.jwt.JwtIntegration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -103,12 +104,17 @@ public class UserController implements HttpHandler {
         try {
             UserLoginDTO userLoginDTO = mapper.readValue(exchange.getRequestBody(), UserLoginDTO.class);
             if (userService.userLogin(userLoginDTO)) {
-                OutputStream os = exchange.getResponseBody();
-                String resString = JsonUtil.createJson("Logged in sucessfully", JsonStatusKey.success, null, null);
+                LinkedHashMap<String, String> map = new LinkedHashMap<>();
+                map.put("message", "Logged in successfully");
+                map.put("status", JsonStatusKey.success.name());
+                String jws = JwtIntegration.createJwt(userLoginDTO.getId(), userLoginDTO.getUserRole());
+                map.put("token", jws);
+                String resString = JsonUtil.createJson(map, null, null);
                 byte[] b = resString.getBytes(StandardCharsets.UTF_8);
+                OutputStream os = exchange.getResponseBody();
                 exchange.getResponseHeaders().add("Content-Type", "application/json");
                 try {
-                    exchange.sendResponseHeaders(500, b.length);
+                    exchange.sendResponseHeaders(200, b.length);
                     os.write(b);
                     os.close();
                 } catch (IOException ex) {

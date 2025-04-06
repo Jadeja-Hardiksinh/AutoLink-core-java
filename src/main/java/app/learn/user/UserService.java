@@ -13,6 +13,8 @@ public class UserService {
         UserDAO userDAO = new UserDAO();
         User user = userDAO.findByEmail(userLoginDTO.getEmail());
         if (user != null) {
+            userLoginDTO.setUserRole(user.getRole());
+            userLoginDTO.setId(user.getId());
             return HashUtil.compareHash(userLoginDTO.getPassword(), user.getPassword());
         } else {
             return false;

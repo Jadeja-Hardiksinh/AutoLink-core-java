@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
+import java.util.Map;
+
 public class JsonUtil {
     private static ObjectMapper mapper = new ObjectMapper();
 
@@ -29,6 +31,28 @@ public class JsonUtil {
             mainNode.put("status", key.name());
 
         }
+        if (object != null) {
+            ObjectNode objNode = mapper.valueToTree(object);
+            if (ignoreFields != null) {
+                for (String field : ignoreFields) {
+                    objNode.remove(field);
+                }
+                mainNode.set("data", objNode);
+            }
+        }
+
+        return mainNode.toString();
+    }
+
+    public static <T> String createJson(Map<String, String> keys, T object, String[] ignoreFields) {
+        ObjectMapper mapper = getObjectMapper();
+        ObjectNode mainNode = mapper.createObjectNode();
+        if (keys != null) {
+            for (Map.Entry<String, String> entry : keys.entrySet()) {
+                mainNode.put(entry.getKey(), entry.getValue());
+            }
+        }
+
         if (object != null) {
             ObjectNode objNode = mapper.valueToTree(object);
             if (ignoreFields != null) {
