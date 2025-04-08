@@ -1,6 +1,7 @@
 package app.learn;
 
 import app.learn.common.controllers.AuthHandler;
+import app.learn.integrations.google.gmail.GoogleAuthController;
 import app.learn.task.TaskController;
 import app.learn.user.UserController;
 import app.learn.user.UserRole;
@@ -10,9 +11,7 @@ import com.sun.net.httpserver.HttpServer;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 
-/**
- * Hello world!
- */
+
 public class App {
     public static void main(String[] args) throws IOException {
 
@@ -21,6 +20,7 @@ public class App {
         server.createContext("/tasks", new AuthHandler(new TaskController(), new UserRole[]{UserRole.ADMIN}));
         server.createContext("/api", new UserController());
         server.createContext("/protected", new AuthHandler(new TaskController(), null));
+        server.createContext("/api/google", new GoogleAuthController());
 
         server.start();
 
