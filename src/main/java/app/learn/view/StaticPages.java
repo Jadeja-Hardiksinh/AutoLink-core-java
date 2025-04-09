@@ -67,24 +67,6 @@ public class StaticPages implements HttpHandler {
             }
 
 
-        } else if (path.equals("/dashboard")) {
-            File file = new File("src/main/resources/html/dashboard.html");
-            if (file.exists()) {
-                try (OutputStream os = httpExchange.getResponseBody()) {
-                    byte[] b = Files.readAllBytes(file.toPath());
-                    httpExchange.getResponseHeaders().add("Content-Type", "text/html");
-                    httpExchange.sendResponseHeaders(200, b.length);
-                    os.write(b);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    serve404Page(httpExchange);
-
-                }
-            } else {
-                serve404Page(httpExchange);
-            }
-
-
         } else if (path.contains("/static")) {
             String filePath = path.replace("/static", "src/main/resources/static");
             File file = new File(filePath);

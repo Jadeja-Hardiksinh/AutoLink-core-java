@@ -10,6 +10,7 @@ import com.sun.net.httpserver.HttpHandler;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -47,7 +48,7 @@ public class UserController implements HttpHandler {
             httpExchange.sendResponseHeaders(404, -1);
             httpExchange.close();
         }
-        
+
     }
 
     public void addRoutes(String regex, String reqMethod, Consumer<HttpExchange> handler) {
@@ -107,12 +108,14 @@ public class UserController implements HttpHandler {
                 LinkedHashMap<String, String> map = new LinkedHashMap<>();
                 map.put("message", "Logged in successfully");
                 map.put("status", JsonStatusKey.success.name());
+                map.put("redirect", "/app/dashboard");
                 String jws = JwtIntegration.createJwt(userLoginDTO.getId(), userLoginDTO.getUserRole());
-                map.put("token", jws);
                 String resString = JsonUtil.createJson(map, null, null);
                 byte[] b = resString.getBytes(StandardCharsets.UTF_8);
                 OutputStream os = exchange.getResponseBody();
                 exchange.getResponseHeaders().add("Content-Type", "application/json");
+                exchange.getResponseHeaders().add("Set-Cookie", "session=" + jws + ";HttpOnly;Secure; Path=/; Max-Age=" + Duration.ofHours(2).getSeconds()
+                );
                 try {
                     exchange.sendResponseHeaders(200, b.length);
                     os.write(b);

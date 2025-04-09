@@ -1,6 +1,7 @@
 package app.learn.common.util;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class TypeConversion {
@@ -16,4 +17,19 @@ public class TypeConversion {
         }
         return map;
     }
+
+    public static String getCookieValFromCookieString(String cookieName, List<String> cookieList) {
+        HashMap<String, String> cookieMap = new HashMap<>();
+        if (cookieList != null && !cookieList.isEmpty()) {
+            String cookiesString = cookieList.getFirst();
+            String[] cookieArr = cookiesString.split(";");
+            for (String cookie : cookieArr) {
+                String[] cookiePair = cookie.split("=");
+                cookieMap.put(cookiePair[0].trim(), cookiePair[1]);
+            }
+        }
+       
+        return cookieMap.get(cookieName);
+    }
+
 }

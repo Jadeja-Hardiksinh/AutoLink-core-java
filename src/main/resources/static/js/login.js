@@ -25,6 +25,7 @@ async function userLogin(reqBody) {
     switch (response.status) {
       case 200:
         showToast(data.message, data.status);
+        window.location.href = data.redirect;
         break;
       case 401:
         showToast(data.message, data.status);

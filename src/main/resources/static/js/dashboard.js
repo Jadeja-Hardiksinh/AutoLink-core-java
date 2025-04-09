@@ -13,5 +13,6 @@ async function fetchAuthUrl() {
       "google-oauth",
       "width=500,height=600"
     );
+    window.close;
   }
 }
