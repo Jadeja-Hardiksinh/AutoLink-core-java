@@ -1,5 +1,6 @@
 package app.learn.integrations.google.util;
 
+import app.learn.integrations.google.Integration;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeRequestUrl;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeTokenRequest;
 import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
@@ -29,11 +30,20 @@ public class GoogleAuthUtil {
         return null;
     }
 
-    public static void getAuthToken(String code) {
+    public static GoogleTokenResponse getAuthToken(String code) {
         GoogleTokenResponse tokenResponse = setAuthTokenRequest(code);
         if (tokenResponse != null) {
-            System.out.println(tokenResponse.getAccessToken());
+            return tokenResponse;
         }
+        return null;
     }
+
+    public static Integration toIntegration(GoogleTokenResponse tokenResponse) {
+        Integration integration = new Integration();
+        integration.setAccessToken(tokenResponse.getAccessToken());
+        return integration;
+
+    }
+
 
 }

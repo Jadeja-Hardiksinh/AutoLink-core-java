@@ -4,6 +4,7 @@ import app.learn.common.enums.JsonStatusKey;
 import app.learn.common.util.JsonUtil;
 import app.learn.common.util.TypeConversion;
 import app.learn.integrations.google.util.GoogleAuthUtil;
+import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
@@ -20,7 +21,8 @@ public class GoogleAuthController implements HttpHandler {
         String reqURL = httpExchange.getRequestURI().getPath();
         if (reqURL.equals("/api/google/oauthcallback")) {
             String code = TypeConversion.getMapFromQueryParam(httpExchange.getRequestURI().getQuery()).get("code");
-            GoogleAuthUtil.getAuthToken(code);
+            GoogleTokenResponse tokenResponse = GoogleAuthUtil.getAuthToken(code);
+
             String html = """
                 <!DOCTYPE html>
                 <html>
